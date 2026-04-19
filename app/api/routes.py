@@ -22,9 +22,9 @@ async def ai_search(request: SearchRequest):
     filters_to_validate = parsed_filters.get("filters", {})
 
     # 2. Validate filters
-    validated = validate_filters(filters_to_validate)
+    validated = validate_filters(filters_to_validate,query)
     print("validated ", validated)
-    # 3. Get similarity terms
+    # 3. Get similarity terms   
     similar_terms = similarity_service.get_similar_terms(query)
 
     # 4. Generate smarter suggestions
@@ -32,7 +32,6 @@ async def ai_search(request: SearchRequest):
     sector = validated.get("sector")
 
     suggestions = [
-        f"Top {query}",
         f"Best companies in {location}",
     ]
 

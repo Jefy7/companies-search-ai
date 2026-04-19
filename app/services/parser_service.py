@@ -31,6 +31,18 @@ class ParserService:
 
     Sectors: Fintech, Healthcare, SaaS, EdTech, Gaming, IoT, Logistics, Cybersecurity, AI, E-commerce
     Locations: London, New York, Bangalore, San Francisco, Berlin, Singapore, Dubai, Sydney, Tokyo, Paris
+    
+    SubSectors:
+    Fintech → Payments, Lending, Insurance, Wealth Management, Banking  
+    Healthcare → Hospitals, Pharmaceuticals, Medical Devices, Telemedicine, HealthTech  
+    SaaS → CRM, HR Tech, Marketing Tools, Analytics, Collaboration  
+    EdTech → E-Learning, Test Prep, Skill Development, Online Courses, LMS  
+    Gaming → Mobile Games, PC Games, Console Games, Esports, Game Development  
+    IoT → Smart Home, Industrial IoT, Wearables, Connected Devices, Automation  
+    Logistics → Supply Chain, Delivery, Warehousing, Freight, Transportation  
+    Cybersecurity → Network Security, Cloud Security, Identity & Access, Threat Detection, Data Security  
+    AI → Machine Learning, NLP, Computer Vision, Robotics, Automation  
+    E-commerce → Marketplaces, D2C, Retail Tech, Payments Integration, Logistics Tech
 
     RULES:
     - If query matches a sector or partial word matches to sector, return it
@@ -39,40 +51,39 @@ class ParserService:
     - Be Case Insensitive
     - Be STRICT but SMART
     - Return ONLY JSON
+    - Use null (not "null")
+    - subSector MUST belong to the selected sector
+    - If unsure, return null
 
     EXAMPLES:
 
-    Query: Fintech
+    Query: fintech payments companies
     Output:
-    {{"sector":"Fintech","location":null,"tags":[]}}
+    {{"sector":"Fintech","location":null,subSector:"Payments","tags":[]}}
 
-    Query: SaaS companies in London
+    Query: SaaS companies in London that provide CRM
     Output:
-    {{"sector":"SaaS","location":"London","tags":[]}}
+    {{"sector":"SaaS","location":"London",subSector:"CRM","tags":[]}}
 
     Query: Healthcare startups
     Output:
-    {{"sector":"Healthcare","location":null,"tags":["startups"]}}
+    {{"sector":"Healthcare","location":null,subSector:null,"tags":["startups"]}}
 
     Query: AI
     Output:
-    {{"sector":"AI","location":null,"tags":[]}}
+    {{"sector":"AI","location":null,subSector:null,"tags":[]}}
 
     Query: New York 
     Output:
-    {{"sector":null,"location":"New York","tags":[]}}
+    {{"sector":null,"location":"New York",subSector:null,"tags":[]}}
 
     Query: New Y
     Output:
-    {{"sector":null,"location":"New York","tags":[]}}
+    {{"sector":null,"location":"New York",subSector:null,"tags":[]}}
 
-    Query: Lo
+    Query: AI startups in New York with Robotics
     Output:
-    {{"sector":Logistics,"location":"London","tags":[]}}
-
-    Query: AI startups in New York 
-    Output:
-    {{"sector":AI,"location":"New York","tags":[startups]}}
+    {{"sector":AI,"location":"New York",subSector:"Robotics","tags":[startups]}}
 
     NOW DO THIS:
 
@@ -115,6 +126,7 @@ class ParserService:
         return {
             "filters": {
                 "sector": data.get("sector"),
+                "subSector": data.get("subSector"),
                 "location": data.get("location"),
                 "tags": data.get("tags", []),
             },

@@ -44,24 +44,44 @@ class LLMService:
         )
         return response[0]["generated_text"]
 
-    def _extract_json(self, text: str) -> dict | None:
-        """
-        Extract JSON safely from LLM output
-        """
+    def _extract_json(self, text: str):
+        if not text:
+            return None
+
         try:
+            # 🔥 Step 1: Try direct parse
+            return json.loads(text)
+
+        except:
+            pass
+
+        try:
+            # 🔥 Step 2: Extract JSON-like content
             match = re.search(r"\{.*\}", text, re.DOTALL)
-            if not match:
-                return None
+            if match:
+                return json.loads(match.group(0))
+        except:
+            pass
 
-            parsed = json.loads(match.group(0))
+        try:
+            # 🔥 Step 3: Fix common LLM issues
+            fixed = text.strip()
 
-            # basic validation
-            if "filters" not in parsed:
-                return None
+            # Add braces if missing
+            if not fixed.startswith("{"):
+                fixed = "{" + fixed
+            if not fixed.endswith("}"):
+                fixed = fixed + "}"
 
-            return parsed
+            # Fix broken null
+            fixed = fixed.replace('"null', 'null').replace('null"', 'null')
 
-        except Exception:
+            # Fix trailing commas / quotes
+            fixed = re.sub(r',\s*}', '}', fixed)
+
+            return json.loads(fixed)
+
+        except:
             return None
 
 

@@ -1,0 +1,44 @@
+from fastapi import APIRouter
+from app.models.schemas import SearchRequest, SearchResponse, Filters
+from app.services.parser_service import parser_service
+from app.services.similarity_service import similarity_service
+from app.utils.validators import validate_filters
+
+router = APIRouter()
+
+@router.get("/health")
+def health():
+    return {"status": "ok"}
+
+@router.post("/api/v1/ai/search", response_model=SearchResponse)
+async def ai_search(request: SearchRequest):
+    query = request.query
+
+    # 1. Parse query using LLM
+    parsed_filters = parser_service.parse_query(query)
+    print(parsed_filters)
+    filters_to_validate = parsed_filters.get("filters", {})
+    # 2. Validate filters
+    validated = validate_filters(filters_to_validate)
+    print("validated", validated)
+    # 3. Get similarity terms
+    similar_terms = similarity_service.get_similar_terms(query)
+
+    # 4. Generate suggestions
+    suggestions = [
+        f"Top {query}",
+        f"Best companies in {validated.get('location') or 'global'}",
+    ]
+
+    confidence = 0.5
+    if validated.get("sector"):
+        confidence += 0.2
+    if validated.get("location"):
+        confidence += 0.2
+
+    return SearchResponse(
+        filters=Filters(**validated),
+        similarTerms=similar_terms,
+        suggestions=suggestions,
+        confidence=0.8
+    )

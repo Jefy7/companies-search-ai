@@ -29,7 +29,7 @@ class ParserService:
         return f"""
     You extract structured filters from company search queries.
 
-    Sectors: Fintech, Healthcare, SaaS, EdTech, Gaming, IoT, Logistics, Cybersecurity, AI
+    Sectors: Fintech, Healthcare, SaaS, EdTech, Gaming, IoT, Logistics, Cybersecurity, AI, E-commerce
     Locations: London, New York, Bangalore, San Francisco, Berlin, Singapore, Dubai, Sydney, Tokyo, Paris
 
     RULES:
